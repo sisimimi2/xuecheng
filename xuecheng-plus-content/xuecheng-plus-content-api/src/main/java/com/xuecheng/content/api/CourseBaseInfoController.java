@@ -2,14 +2,14 @@ package com.xuecheng.content.api;
 
 import com.xuecheng.base.model.PageParams;
 import com.xuecheng.base.model.PageResult;
-import com.xuecheng.content.model.dto.AddCourseDto;
-import com.xuecheng.content.model.dto.CourseBaseInfoDto;
-import com.xuecheng.content.model.dto.EditCourseDto;
-import com.xuecheng.content.model.dto.QueryCourseParamsDto;
+import com.xuecheng.content.model.dto.*;
 import com.xuecheng.content.model.po.CourseBase;
+import com.xuecheng.content.model.po.Teachplan;
 import com.xuecheng.content.service.CourseBaseInfoService;
+import com.xuecheng.content.service.TeachplanService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,18 +30,22 @@ public class CourseBaseInfoController {
     @Autowired
     CourseBaseInfoService courseBaseInfoService;
 
+    @Autowired
+    TeachplanService teachplanService;
+
     @ApiOperation("课程查询接口")
     @PostMapping("/course/list")
-    public PageResult<CourseBase> list(PageParams pageParams, @RequestBody(required=false) QueryCourseParamsDto queryCourseParamsDto) {
+    public PageResult<CourseBase> list(PageParams pageParams, @RequestBody(required = false) QueryCourseParamsDto queryCourseParamsDto) {
 
         PageResult<CourseBase> courseBasePageResult = courseBaseInfoService.queryCourseBaseList(pageParams, queryCourseParamsDto);
 
         return courseBasePageResult;
 
     }
+
     @ApiOperation("新增课程")
     @PostMapping("/course")
-    public CourseBaseInfoDto createCourseBase(@RequestBody AddCourseDto addCourseDto){
+    public CourseBaseInfoDto createCourseBase(@RequestBody AddCourseDto addCourseDto) {
         //获取到用户所属机构的id
         Long companyId = 1232141425L;
 //        int i = 1/0;
@@ -51,14 +55,31 @@ public class CourseBaseInfoController {
 
     @ApiOperation("根据课程id查询课程基础信息")
     @GetMapping("/course/{courseId}")
-    public CourseBaseInfoDto getCourseBaseById(@PathVariable long courseId){
+    public CourseBaseInfoDto getCourseBaseById(@PathVariable long courseId) {
         return courseBaseInfoService.getCourseBaseInfo(courseId);
     }
 
     @ApiOperation("修改课程基础信息接口")
     @PutMapping("/course")
-    public CourseBaseInfoDto modifyCourseBase(@RequestBody EditCourseDto editCourseDto){
+    public CourseBaseInfoDto modifyCourseBase(@RequestBody EditCourseDto editCourseDto) {
         Long companyId = 1232141425L;
         return courseBaseInfoService.updateCourseBase(companyId, editCourseDto);
+    }
+
+    @ApiOperation("课程计划创建或修改")
+    @PostMapping("/teachplan")
+    public void saveTeachplan(@RequestBody Teachplan teachplanDto) {
+        teachplanService.saveTeachplan(teachplanDto);
+    }
+    @ApiOperation("课程计划删除")
+    @DeleteMapping("/teachplan/{teachplanId}")
+    public void deleteTeachplan(@PathVariable Long teachplanId) {
+        teachplanService.deleteTeachplan(teachplanId);
+    }
+
+    @ApiOperation("查询课程计划树形结构")
+    @GetMapping("/teachplan/{courseId}/tree-nodes")
+    public List<TeachplanDto> getTreeNodes(@PathVariable Long courseId) {
+        return teachplanService.findTeachplanTree(courseId);
     }
 }
