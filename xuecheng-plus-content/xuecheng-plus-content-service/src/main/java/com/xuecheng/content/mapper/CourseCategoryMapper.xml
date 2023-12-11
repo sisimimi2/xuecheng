@@ -18,16 +18,42 @@
         id, name, label, parentid, is_show, orderby, is_leaf
     </sql>
 
-    <select id="selectTreeNodes"  parameterType="string" resultType="com.xuecheng.content.model.dto.CourseCategoryTreeDto">
-        with recursive t1 as (
-            select * from course_category where id=#{id}
-            union all
-            select t2.* from course_category t2 inner join t1 on t1.id = t2.parentid
-
-        )
-        select * from t1
-        order by t1.id
-
+    <select id="selectTreeNodes" resultMap="treeNodeResultMap" >
+        select
+            one.id            one_id,
+            one.name          one_name,
+            one.parentid      one_parentid,
+            one.orderby       one_orderby,
+            one.label         one_label,
+            two.id            two_id,
+            two.name          two_name,
+            two.parentid      two_parentid,
+            two.orderby       two_orderby,
+            two.label         two_label
+        from course_category one
+                 inner join course_category two on one.id = two.parentid
+        where one.parentid = 1
+          and one.is_show = 1
+          and two.is_show = 1
+        order by one.orderby,
+                 two.orderby
     </select>
-
+    <!-- 课程分类树型结构查询映射结果 -->
+    <resultMap id="treeNodeResultMap" type="com.xuecheng.content.model.dto.CourseCategoryTreeDto">
+        <!-- 一级数据映射 -->
+        <id     column="one_id"        property="id" />
+        <result column="one_name"      property="name" />
+        <result column="one_label"     property="label" />
+        <result column="one_parentid"  property="parentid" />
+        <result column="one_orderby"   property="orderby" />
+        <!-- 一级中包含多个二级数据：二级的集合数据 -->
+        <collection property="childrenTreeNodes" ofType="com.xuecheng.content.model.dto.CourseCategoryTreeDto">
+            <!-- 二级数据映射 -->
+            <id     column="two_id"        property="id" />
+            <result column="two_name"      property="name" />
+            <result column="two_label"     property="label" />
+            <result column="two_parentid"  property="parentid" />
+            <result column="two_orderby"   property="orderby" />
+        </collection>
+    </resultMap>
 </mapper>

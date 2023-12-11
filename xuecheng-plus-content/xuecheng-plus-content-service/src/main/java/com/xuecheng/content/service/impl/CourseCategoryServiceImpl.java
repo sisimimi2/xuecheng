@@ -28,7 +28,7 @@ public class CourseCategoryServiceImpl implements CourseCategoryService {
     @Override
     public List<CourseCategoryTreeDto> queryTreeNodes(String id) {
         //调用mapper递归查询出分类信息
-        List<CourseCategoryTreeDto> courseCategoryTreeDtos = courseCategoryMapper.selectTreeNodes(id);
+        List<CourseCategoryTreeDto> courseCategoryTreeDtos = courseCategoryMapper.selectTreeNodes();
 
         //找到每个节点的子节点，最终封装成List<CourseCategoryTreeDto>
         //先将list转成map，key就是结点的id，value就是CourseCategoryTreeDto对象，目的就是为了方便从map获取结点,filter(item->!id.equals(item.getId()))把根结点排除
@@ -50,11 +50,7 @@ public class CourseCategoryServiceImpl implements CourseCategoryService {
                 //到每个节点的子节点放在父节点的childrenTreeNodes属性中
                 courseCategoryParent.getChildrenTreeNodes().add(item);
             }
-
-
-
         });
-
         return courseCategoryList;
     }
 }
