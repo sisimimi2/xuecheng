@@ -1,17 +1,13 @@
 spring:
   application:
-    name: system-service
+    name: content-service
   cloud:
     nacos:
-      server-addr: 192.168.50.130:8848
+      server-addr: 192.128.50.130:8848
       config:
         namespace: ${spring.profiles.active}
         group: xuecheng-plus-project
         file-extension: yaml
         refresh-enabled: true
-        shared-configs:
-          - data-id: logging-${spring.profiles.active}.yaml
-            group: xuecheng-plus-common
-            refresh: true
   profiles:
     active: dev
